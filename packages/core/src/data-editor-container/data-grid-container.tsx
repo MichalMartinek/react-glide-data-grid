@@ -38,11 +38,13 @@ const Wrapper = styled.div<{ innerWidth: string; innerHeight: string }>`
 
 interface Props extends WrapperProps, React.HTMLAttributes<HTMLDivElement> {}
 
-export const DataEditorContainer: React.FunctionComponent<React.PropsWithChildren<Props>> = p => {
-    const { inWidth, inHeight, children, ...rest } = p;
-    return (
-        <Wrapper innerHeight={toCss(inHeight)} innerWidth={toCss(inWidth)} {...rest}>
-            {children}
-        </Wrapper>
-    );
-};
+export const DataEditorContainer: React.FunctionComponent<React.PropsWithChildren<Props>> = React.forwardRef(
+    (p, ref) => {
+        const { inWidth, inHeight, children, ...rest } = p;
+        return (
+            <Wrapper innerHeight={toCss(inHeight)} innerWidth={toCss(inWidth)} {...rest} ref={ref}>
+                {children}
+            </Wrapper>
+        );
+    }
+);

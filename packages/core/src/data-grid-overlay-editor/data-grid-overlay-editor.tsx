@@ -25,6 +25,7 @@ interface DataGridOverlayEditorProps {
     readonly target: Rectangle;
     readonly cell: Item;
     readonly content: GridCell;
+    readonly gridRef: any;
     readonly className?: string;
     readonly id: string;
     readonly initialValue?: string;
@@ -56,6 +57,7 @@ const DataGridOverlayEditor: React.FunctionComponent<DataGridOverlayEditorProps>
         theme,
         id,
         cell,
+        gridRef,
         validateCell,
         provideEditor,
     } = p;
@@ -214,6 +216,43 @@ const DataGridOverlayEditor: React.FunctionComponent<DataGridOverlayEditorProps>
 
     styleOverride = { ...styleOverride, ...stayOnScreenStyle };
 
+    const containerRef = React.useRef(null);
+    React.useEffect(() => {
+        if (!containerRef?.current || !gridRef?.current) {
+            return;
+        }
+        let lastKnownScrollPosition = 0;
+        let ticking = false;
+
+        const doSomething = scrollPos => {
+            // Do something with the scroll position
+            const containerRect = gridRef?.current?.getBoundingClientRect();
+            const editorRect = containerRef?.current.getBoundingClientRect();
+            if (
+                editorRect.top + editorRect.height > containerRect.top + containerRect.height ||
+                editorRect.top < containerRect.top
+                // editorRect.top > containerRect.top + containerRect.height ||
+                // editorRect.top + editorRect.height < containerRect.top
+            ) {
+                onClickOutside();
+            }
+        };
+        const handleScroll = event => {
+            lastKnownScrollPosition = window.scrollY;
+            if (!ticking) {
+                window.requestAnimationFrame(() => {
+                    doSomething(lastKnownScrollPosition);
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        };
+        document.addEventListener("scroll", handleScroll);
+        return () => {
+            document.removeEventListener("scroll", handleScroll);
+        };
+    }, [gridRef, containerRef, onClickOutside]);
+
     // Consider imperatively creating and adding the element to the dom?
     const portalElement = document.getElementById("portal");
     if (portalElement === null) {
@@ -246,7 +285,10 @@ const DataGridOverlayEditor: React.FunctionComponent<DataGridOverlayEditorProps>
                     targetY={target.y}
                     targetWidth={target.width}
                     targetHeight={target.height}>
-                    <div className="clip-region" onKeyDown={customEditor === undefined ? undefined : onKeyDownCustom}>
+                    <div
+                        className="clip-region"
+                        onKeyDown={customEditor === undefined ? undefined : onKeyDownCustom}
+                        ref={containerRef}>
                         {editor}
                     </div>
                 </DataGridOverlayEditorStyle>

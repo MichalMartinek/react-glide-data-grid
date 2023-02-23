@@ -583,6 +583,7 @@ const DataEditorImpl: React.ForwardRefRenderFunction<DataEditorRef, DataEditorPr
     const cellXOffset = visibleRegion.x + rowMarkerOffset;
     const cellYOffset = visibleRegion.y;
 
+    const containerRef = React.useRef(null);
     const gridRef = React.useRef<DataGridRef | null>(null);
 
     const focus = React.useCallback((immediate?: boolean) => {
@@ -2707,7 +2708,7 @@ const DataEditorImpl: React.ForwardRefRenderFunction<DataEditorRef, DataEditorPr
                 return gridRef.current?.getBounds(col + rowMarkerOffset, row);
             },
             focus: () => gridRef.current?.focus(),
-            emit: async e => {
+            emit: async (e, otherParams?: any) => {
                 switch (e) {
                     case "delete":
                         onKeyDown({
@@ -2866,6 +2867,7 @@ const DataEditorImpl: React.ForwardRefRenderFunction<DataEditorRef, DataEditorPr
             <DataEditorContainer
                 style={makeCSSStyle(mergedTheme)}
                 className={className}
+                ref={containerRef}
                 inWidth={width ?? idealWidth}
                 inHeight={height ?? idealHeight}>
                 <DataGridSearch
@@ -2936,6 +2938,7 @@ const DataEditorImpl: React.ForwardRefRenderFunction<DataEditorRef, DataEditorPr
                         id={overlayID}
                         className={p.experimental?.isSubGrid === true ? "click-outside-ignore" : undefined}
                         provideEditor={provideEditor}
+                        gridRef={containerRef}
                         imageEditorOverride={imageEditorOverride}
                         onFinishEditing={onFinishEditing}
                         markdownDivCreateNode={markdownDivCreateNode}
