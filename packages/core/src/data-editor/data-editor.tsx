@@ -2721,6 +2721,18 @@ const DataEditorImpl: React.ForwardRefRenderFunction<DataEditorRef, DataEditorPr
                             altKey: false,
                         });
                         break;
+                    case "enter":
+                        onKeyDown({
+                            bounds: otherParams,
+                            cancel: () => undefined,
+                            ctrlKey: false,
+                            key: "Enter",
+                            keyCode: 13,
+                            metaKey: false,
+                            shiftKey: false,
+                            altKey: false,
+                        });
+                        break;
                     case "fill-right":
                         onKeyDown({
                             bounds: undefined,
