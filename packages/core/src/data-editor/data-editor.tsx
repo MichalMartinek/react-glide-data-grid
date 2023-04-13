@@ -634,7 +634,7 @@ const DataEditorImpl: React.ForwardRefRenderFunction<DataEditorRef, DataEditorPr
                 title: rowMarkerHeader,
                 width: rowMarkerWidth,
                 icon: undefined,
-                hasMenu: false,
+                hasMenu: true,
                 style: "normal" as const,
             },
             ...columns,
