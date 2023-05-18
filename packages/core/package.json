@@ -1,6 +1,6 @@
 {
     "name": "react-glide-data-grid",
-    "version": "5.0.25",
+    "version": "5.0.27",
     "description": "Super fast, pure canvas Data Grid Editor",
     "sideEffects": [
         "**/*.css"

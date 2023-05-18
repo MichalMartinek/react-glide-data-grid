@@ -439,6 +439,7 @@ const DataGridSearch: React.FunctionComponent<DataGridSearchProps> = p => {
                 onMouseDown={p.onMouseDown}
                 onMouseUp={p.onMouseUp}
                 onRowMoved={p.onRowMoved}
+                onRowStartsMoving={p.onRowStartsMoving}
                 onVisibleRegionChanged={p.onVisibleRegionChanged}
                 overscrollX={p.overscrollX}
                 overscrollY={p.overscrollY}

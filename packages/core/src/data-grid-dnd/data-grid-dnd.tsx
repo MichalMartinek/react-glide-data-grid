@@ -8,6 +8,7 @@ type Props = Omit<DataGridProps, "dragAndDropState" | "isResizing" | "isDragging
 
 export interface DataGridDndProps extends Props {
     readonly onRowMoved?: (startIndex: number, endIndex: number) => void;
+    readonly onRowStartsMoving?: (startIndex: number) => void;
     readonly onColumnMoved?: (startIndex: number, endIndex: number) => void;
 
     readonly onColumnResize?: (column: GridColumn, newSize: number, colIndex: number) => void; // these should not be past tense?
@@ -51,6 +52,7 @@ const DataGridDnd: React.FunctionComponent<DataGridDndProps> = p => {
         minColumnWidth,
         onHeaderMenuClick,
         onRowMoved,
+        onRowStartsMoving,
         lockColumns,
         getCellContent,
     } = p;
@@ -103,13 +105,16 @@ const DataGridDnd: React.FunctionComponent<DataGridDndProps> = p => {
                     row !== undefined &&
                     onRowMoved !== undefined
                 ) {
+                    if (onRowStartsMoving !== undefined) {
+                        onRowStartsMoving(row);
+                    }
                     setDragStartY(args.bounds.y);
                     setDragRow(row);
                 }
             }
             onMouseDown?.(args);
         },
-        [onMouseDown, canResize, lockColumns, onRowMoved, gridRef, columns, canDragCol, onColumnResizeStart]
+        [onMouseDown, canResize, lockColumns, onRowMoved, onRowStartsMoving, gridRef, columns, canDragCol, onColumnResizeStart]
     );
 
     const onHeaderMenuClickMangled = React.useCallback(
