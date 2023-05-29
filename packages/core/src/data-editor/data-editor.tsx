@@ -1155,6 +1155,27 @@ const DataEditorImpl: React.ForwardRefRenderFunction<DataEditorRef, DataEditorPr
                     }
                 }
             } else if (args.kind === "header") {
+                if (lastSelectedColRef.current === col) {
+                    const column = mangledCols[col];
+                    if (column?.allowOverlay) {
+                        const content = `${column.item?.name}${column.item?.type ? `:${column.item?.type}` : ""}`;
+                        setOverlaySimple({
+                            target: args.bounds,
+                            content: {
+                                kind: column.kind || GridCellKind.Text,
+                                displayData: content,
+                                data: content,
+                                allowOverlay: true,
+                                editorType: column.editorType,
+                            },
+                            initialValue: content,
+                            cell: args.location,
+                            highlight: true,
+                            forceEditMode: true,
+                        });
+                        return;
+                    }
+                }
                 lastMouseSelectLocation.current = [col, row];
                 setOverlay(undefined);
                 if (hasRowMarkers && col === 0) {
@@ -1519,6 +1540,7 @@ const DataEditorImpl: React.ForwardRefRenderFunction<DataEditorRef, DataEditorPr
                 }
                 if (args.kind === "cell") {
                     // click that cell
+                    // TODO:
                     if (!handleMaybeClick(args)) {
                         handleSelect(args);
                     }
@@ -2734,6 +2756,7 @@ const DataEditorImpl: React.ForwardRefRenderFunction<DataEditorRef, DataEditorPr
                             altKey: false,
                         });
                         break;
+
                     case "fill-right":
                         onKeyDown({
                             bounds: undefined,
