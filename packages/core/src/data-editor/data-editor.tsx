@@ -200,6 +200,7 @@ export interface DataEditorProps extends Props {
     readonly onGroupHeaderRenamed?: (groupName: string, newVal: string) => void;
     readonly onCellClicked?: (cell: Item, event: CellClickedEventArgs) => void;
     readonly onCellActivated?: (cell: Item) => void;
+    readonly onHeadeCellActivated?: (cell: GridMouseEventArgs) => void;
     readonly onFinishedEditing?: (newValue: GridCell | undefined, movement: Item) => void;
     readonly onHeaderContextMenu?: (colIndex: number, event: HeaderClickedEventArgs) => void;
     readonly onGroupHeaderContextMenu?: (colIndex: number, event: GroupHeaderClickedEventArgs) => void;
@@ -343,6 +344,7 @@ const DataEditorImpl: React.ForwardRefRenderFunction<DataEditorRef, DataEditorPr
         getCellContent,
         onCellClicked,
         onCellActivated,
+        onHeadeCellActivated,
         onFinishedEditing,
         coercePasteValue,
         drawHeader: drawHeaderIn,
@@ -1173,6 +1175,9 @@ const DataEditorImpl: React.ForwardRefRenderFunction<DataEditorRef, DataEditorPr
                             highlight: true,
                             forceEditMode: true,
                         });
+                        if (onHeadeCellActivated) {
+                            onHeadeCellActivated(args);
+                        }
                         return;
                     }
                 }
@@ -1250,6 +1255,7 @@ const DataEditorImpl: React.ForwardRefRenderFunction<DataEditorRef, DataEditorPr
             setSelectedColumns,
             setSelectedRows,
             showTrailingBlankRow,
+            onHeadeCellActivated,
         ]
     );
 
@@ -2756,7 +2762,27 @@ const DataEditorImpl: React.ForwardRefRenderFunction<DataEditorRef, DataEditorPr
                             altKey: false,
                         });
                         break;
-
+                    case "edit-col":
+                        const column = mangledCols[otherParams.location[0]];
+                        if (column?.allowOverlay) {
+                            const content = `${column.item?.name}${column.item?.type ? `:${column.item?.type}` : ""}`;
+                            setOverlaySimple({
+                                target: otherParams.target,
+                                content: {
+                                    kind: column.kind || GridCellKind.Text,
+                                    displayData: content,
+                                    data: content,
+                                    allowOverlay: true,
+                                    editorType: column.editorType,
+                                },
+                                initialValue: content,
+                                cell: otherParams.location,
+                                highlight: true,
+                                forceEditMode: true,
+                            });
+                            return;
+                        }
+                        break;
                     case "fill-right":
                         onKeyDown({
                             bounds: undefined,
