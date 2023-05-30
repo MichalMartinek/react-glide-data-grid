@@ -1160,7 +1160,10 @@ const DataEditorImpl: React.ForwardRefRenderFunction<DataEditorRef, DataEditorPr
                 if (lastSelectedColRef.current === col) {
                     const column = mangledCols[col];
                     if (column?.allowOverlay) {
-                        const content = `${column.item?.name}${column.item?.type ? `:${column.item?.type}` : ""}`;
+                        const content =
+                            column.item.input && !column.isCross
+                                ? column.item?.name
+                                : `${column.item?.name}${column.item?.type ? `:${column.item?.type}` : ""}`;
                         setOverlaySimple({
                             target: args.bounds,
                             content: {
