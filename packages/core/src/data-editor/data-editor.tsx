@@ -201,6 +201,8 @@ export interface DataEditorProps extends Props {
     readonly onCellClicked?: (cell: Item, event: CellClickedEventArgs) => void;
     readonly onCellActivated?: (cell: Item) => void;
     readonly onHeadeCellActivated?: (cell: GridMouseEventArgs) => void;
+    readonly onRowMarkersMenuClick?: (cell: GridMouseEventArgs) => void;
+    readonly onAnyMouseUp?: () => void;
     readonly onFinishedEditing?: (newValue: GridCell | undefined, movement: Item) => void;
     readonly onHeaderContextMenu?: (colIndex: number, event: HeaderClickedEventArgs) => void;
     readonly onGroupHeaderContextMenu?: (colIndex: number, event: GroupHeaderClickedEventArgs) => void;
@@ -223,7 +225,7 @@ export interface DataEditorProps extends Props {
     readonly headerHeight?: number;
     readonly groupHeaderHeight?: number;
 
-    readonly rowMarkers?: "checkbox" | "number" | "clickable-number" | "both" | "none";
+    readonly rowMarkers?: "checkbox" | "number" | "clickable-number" | "both" | "both-with-menu" | "both-with-menu-except-first"| "none";
     readonly rowMarkerWidth?: number;
     readonly rowMarkerStartIndex?: number;
 
@@ -381,6 +383,8 @@ const DataEditorImpl: React.ForwardRefRenderFunction<DataEditorRef, DataEditorPr
         rowSelectionMode = "auto",
         rowMarkerStartIndex = 1,
         onHeaderMenuClick,
+        onRowMarkersMenuClick,
+        onAnyMouseUp,
         getGroupDetails,
         onSearchClose: onSearchCloseIn,
         onItemHovered,
@@ -1061,7 +1065,8 @@ const DataEditorImpl: React.ForwardRefRenderFunction<DataEditorRef, DataEditorPr
                             markerCell,
                             args.localEventX,
                             args.localEventY,
-                            args.bounds
+                            args.bounds,
+                            onRowMarkersMenuClick
                         ) as MarkerCell | undefined;
                         if (postClick === undefined || postClick.checked === markerCell.checked) return;
                     }
@@ -1248,6 +1253,7 @@ const DataEditorImpl: React.ForwardRefRenderFunction<DataEditorRef, DataEditorPr
             lastRowSticky,
             onSelectionCleared,
             p.onRowMoved,
+            onRowMarkersMenuClick,
             rowMarkerOffset,
             rowMarkers,
             rowSelect,
@@ -1466,6 +1472,8 @@ const DataEditorImpl: React.ForwardRefRenderFunction<DataEditorRef, DataEditorPr
             setMouseState(undefined);
             setScrollDir(undefined);
 
+            onAnyMouseUp?.();
+
             if (isOutside) return;
 
             const [col, row] = args.location;
@@ -1495,7 +1503,7 @@ const DataEditorImpl: React.ForwardRefRenderFunction<DataEditorRef, DataEditorPr
                         const c = getMangledCellContent([col, row]);
                         const r = c.kind === GridCellKind.Custom ? undefined : CellRenderers[c.kind];
                         if (r !== undefined && r.onClick !== undefined) {
-                            const newVal = r.onClick(c, a.localEventX, a.localEventY, a.bounds);
+                            const newVal = r.onClick(c, a.localEventX, a.localEventY, a.bounds, onRowMarkersMenuClick); //TODO:
                             if (newVal !== undefined && !isInnerOnlyCell(newVal) && isEditableGridCell(newVal)) {
                                 mangledOnCellsEdited([{ location: a.location, value: newVal }]);
                                 gridRef.current?.damage([
@@ -1605,6 +1613,8 @@ const DataEditorImpl: React.ForwardRefRenderFunction<DataEditorRef, DataEditorPr
             onCellContextMenu,
             onHeaderContextMenu,
             onGroupHeaderContextMenu,
+            onRowMarkersMenuClick,
+            onAnyMouseUp,
             handleSelect,
             normalSizeColumn,
             onHeaderClicked,

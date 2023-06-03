@@ -1,22 +1,22 @@
 /* eslint-disable unicorn/no-for-loop */
+import { clearCache, split as splitText } from "canvas-hypertxt";
+import React from "react";
 import type { Theme } from "../common/styles";
+import { assertNever } from "../common/support";
+import { degreesToRadians, direction } from "../common/utils";
+import type { DrawArgs } from "../data-editor/custom-cell-draw-args";
+import type { BaseDrawArgs, PrepResult } from "./cells/cell-types";
 import {
-    DrilldownCellData,
-    Item,
-    GridSelection,
-    InnerGridCell,
-    SizedGridColumn,
-    Rectangle,
     BaseGridCell,
     BooleanEmpty,
     BooleanIndeterminate,
+    DrilldownCellData,
+    GridSelection,
+    InnerGridCell,
+    Item,
+    Rectangle,
+    SizedGridColumn,
 } from "./data-grid-types";
-import { degreesToRadians, direction } from "../common/utils";
-import React from "react";
-import type { BaseDrawArgs, PrepResult } from "./cells/cell-types";
-import { assertNever } from "../common/support";
-import { split as splitText, clearCache } from "canvas-hypertxt";
-import type { DrawArgs } from "../data-editor/custom-cell-draw-args";
 
 export interface MappedGridColumn extends SizedGridColumn {
     sourceIndex: number;
@@ -621,7 +621,7 @@ export function drawMarkerRowCell(
     args: BaseDrawArgs,
     index: number,
     checked: boolean,
-    markerKind: "checkbox" | "both" | "number",
+    markerKind: "both-with-menu" | "both-with-menu-except-first" | "checkbox" | "both" | "number",
     drawHandle: boolean
 ) {
     const { ctx, x, y, w: width, h: height, hoverAmount, theme } = args;
@@ -654,11 +654,16 @@ export function drawMarkerRowCell(
         }
         ctx.globalAlpha = 1;
     }
-    if (markerKind === "number" || (markerKind === "both" && !checked)) {
+    if (
+        markerKind === "number" ||
+        (markerKind === "both" && !checked) ||
+        (markerKind === "both-with-menu-except-first" && !checked) ||
+        (markerKind === "both-with-menu" && !checked)
+    ) {
         const text = index.toString();
 
         const start = x + width / 2;
-        if (markerKind === "both" && hoverAmount !== 0) {
+        if (["both", "both-with-menu", "both-with-menu-except-first"].includes(markerKind) && hoverAmount !== 0) {
             ctx.globalAlpha = 1 - hoverAmount;
         }
         ctx.fillStyle = theme.textLight;
@@ -666,6 +671,35 @@ export function drawMarkerRowCell(
         if (hoverAmount !== 0) {
             ctx.globalAlpha = 1;
         }
+    }
+    if (
+        (markerKind === "both-with-menu" || (markerKind === "both-with-menu-except-first" && index > 1)) &&
+        drawHandle
+    ) {
+        ctx.beginPath();
+        const triangleX = x + width - 18;
+        const triangleY = y + height / 2 - 3;
+        roundedPoly(
+            ctx,
+            [
+                {
+                    x: triangleX,
+                    y: triangleY,
+                },
+                {
+                    x: triangleX + 11,
+                    y: triangleY,
+                },
+                {
+                    x: triangleX + 5.5,
+                    y: triangleY + 6,
+                },
+            ],
+            1
+        );
+
+        ctx.fillStyle = theme.textHeader;
+        ctx.fill();
     }
 }
 

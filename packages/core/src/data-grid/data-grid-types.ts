@@ -468,7 +468,7 @@ export interface MarkerCell extends BaseGridCell {
     readonly row: number;
     readonly drawHandle: boolean;
     readonly checked: boolean;
-    readonly markerKind: "checkbox" | "number" | "both";
+    readonly markerKind: "both-with-menu" | "both-with-menu-except-first" | "checkbox" | "number" | "both";
 }
 
 export type Slice = Item;

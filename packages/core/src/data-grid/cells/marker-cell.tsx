@@ -11,7 +11,7 @@ export const markerCellRenderer: InternalCellRenderer<MarkerCell> = {
     renderDeprep: deprepMarkerRowCell,
     measure: () => 44,
     render: a => drawMarkerRowCell(a, a.cell.row, a.cell.checked, a.cell.markerKind, a.cell.drawHandle),
-    onClick: (cell, x, y, bounds) => {
+    onClick: (cell, x, y, bounds, extraFn) => {
         const { width, height } = bounds;
 
         const centerX = cell.drawHandle ? 7 + (width - 7) / 2 : width / 2;
@@ -22,6 +22,9 @@ export const markerCellRenderer: InternalCellRenderer<MarkerCell> = {
                 ...cell,
                 checked: !cell.checked,
             };
+        }
+        if (Math.abs(width - x) <= 18 && Math.abs(y - centerY) <= 10 && extraFn) {
+            extraFn(cell, bounds);
         }
         return undefined;
     },

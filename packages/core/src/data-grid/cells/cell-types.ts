@@ -66,7 +66,13 @@ export interface InternalCellRenderer<T extends InnerGridCell> {
     readonly needsHoverPosition: boolean;
     readonly useLabel?: boolean;
     readonly measure: (ctx: CanvasRenderingContext2D, cell: T, theme: Theme) => number;
-    readonly onClick?: (cell: T, posX: number, posY: number, bounds: Rectangle) => T | undefined;
+    readonly onClick?: (
+        cell: T,
+        posX: number,
+        posY: number,
+        bounds: Rectangle,
+        extraFn?: (cell: T, bounds: Rectangle) => void
+    ) => T | undefined;
     readonly onDelete?: (cell: T) => T | undefined;
     readonly getAccessibilityString: (cell: T) => string;
     readonly getEditor?: ProvideEditorCallback<T>;
